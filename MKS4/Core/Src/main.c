@@ -31,7 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define ADC_Q (15)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -63,7 +63,10 @@ static volatile uint32_t raw_pot;
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
   {
-    raw_pot = HAL_ADC_GetValue(hadc);  // Read ADC value
+    static uint32_t avg_pot;
+    raw_pot = avg_pot >> ADC_Q;
+    avg_pot -= raw_pot;
+    avg_pot += HAL_ADC_GetValue(hadc);
   }
 
 
