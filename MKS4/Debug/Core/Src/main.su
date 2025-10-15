@@ -1,7 +1,9 @@
-../Core/Src/main.c:64:6:HAL_ADC_ConvCpltCallback	16	static
-../Core/Src/main.c:79:5:main	16	static
-../Core/Src/main.c:149:6:SystemClock_Config	80	static
-../Core/Src/main.c:190:13:MX_ADC_Init	24	static
-../Core/Src/main.c:244:13:MX_USART2_UART_Init	8	static
-../Core/Src/main.c:279:13:MX_GPIO_Init	56	static
-../Core/Src/main.c:333:6:Error_Handler	8	static,ignoring_inline_asm
+../Core/Src/main.c:74:6:HAL_ADC_ConvCpltCallback	16	static
+../Core/Src/main.c:151:13:calculate_voltage	16	static
+../Core/Src/main.c:101:5:main	24	static
+../Core/Src/main.c:155:12:calculate_temperature	24	static
+../Core/Src/main.c:198:6:SystemClock_Config	80	static
+../Core/Src/main.c:239:13:MX_ADC_Init	24	static
+../Core/Src/main.c:309:13:MX_USART2_UART_Init	8	static
+../Core/Src/main.c:344:13:MX_GPIO_Init	56	static
+../Core/Src/main.c:404:6:Error_Handler	8	static,ignoring_inline_asm

@@ -32,6 +32,12 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define ADC_Q (15)
+
+#define TEMP110_CAL_ADDR ((uint16_t*) ((uint32_t) 0x1FFFF7C2))
+#define TEMP30_CAL_ADDR ((uint16_t*) ((uint32_t) 0x1FFFF7B8))
+
+#define VREFINT_CAL_ADDR ((uint16_t*) ((uint32_t) 0x1FFFF7BA))
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -59,14 +65,30 @@ static void MX_ADC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-static volatile uint32_t raw_pot;
+
+static volatile uint32_t raw_pot = 0;
+static volatile uint16_t raw_temp = 0;
+static volatile uint16_t raw_volt = 0;
+static uint8_t channel = 0;
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
   {
-    static uint32_t avg_pot;
-    raw_pot = avg_pot >> ADC_Q;
-    avg_pot -= raw_pot;
-    avg_pot += HAL_ADC_GetValue(hadc);
+	if (channel == 0) {
+		static uint32_t avg_pot;
+		raw_pot = avg_pot >> ADC_Q;
+		avg_pot -= raw_pot;
+		avg_pot += HAL_ADC_GetValue(hadc);
+	} else if (channel == 1) {
+	    raw_temp = HAL_ADC_GetValue(hadc);
+	} else if (channel == 2) {
+	    raw_volt = HAL_ADC_GetValue(hadc);
+	}
+	// Check if end of sequence
+	    if (__HAL_ADC_GET_FLAG(hadc, ADC_FLAG_EOS)) {
+	        channel = 0;
+	    } else {
+	        channel++;
+	    }
   }
 
 
@@ -113,6 +135,10 @@ int main(void)
 
 
 
+
+  static enum { SHOW_POT, SHOW_VOLT, SHOW_TEMP } state = SHOW_POT;
+  static uint32_t state_change_time = 0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -122,22 +148,45 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  uint32_t scaled = ((raw_pot * 501) / 4096);         // Rescale to 0–500
-	  uint8_t led_count = ((raw_pot * 9) / 4096);         // Determine LED bargraph level (0–8)
-	  sct_value(scaled, led_count);                   // Display value and LED bargraph
-	  HAL_Delay(50);									// Wait 50ms
+	  uint32_t calculate_voltage(void) {
+	       return 330 * (*VREFINT_CAL_ADDR) / raw_volt;
+	   }
 
-	  /*
-	  HAL_ADC_Start(&hadc);
-	      HAL_ADC_PollForConversion(&hadc, HAL_MAX_DELAY);
-	      raw_pot = HAL_ADC_GetValue(&hadc);
+	  int32_t calculate_temperature(void) {
+	        int32_t temperature = (raw_temp - (int32_t)(*TEMP30_CAL_ADDR));
+	        temperature = temperature * (110 - 30);
+	        temperature = temperature / ((int32_t)(*TEMP110_CAL_ADDR - *TEMP30_CAL_ADDR));
+	        return temperature + 30;
+	    }
 
-	      uint32_t scaled = (raw_pot * 500) / 4096;
-	      uint8_t led_count = (raw_pot * 8) / 4096;
-	      sct_value(scaled, led_count);
 
-	      HAL_Delay(50);
-	       */
+	  static uint32_t state_change_time = 0;
+
+	          // Cycle to next state
+	          if (HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin) == 0) {
+	              state = SHOW_VOLT;
+	          } else if (HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin) == 0) {
+	              state = SHOW_TEMP;
+	          } else {
+	              state = SHOW_POT;
+	          }
+
+
+	      // Display value based on current state
+	      if (state == SHOW_POT) {
+	    	  uint32_t scaled = ((raw_pot * 501) / 4096);         // Rescale to 0–500
+	    	  uint8_t led_count = ((raw_pot * 9) / 4096);         // Determine LED bargraph level (0–8)
+	    	  sct_value(scaled, led_count);                   // Display value and LED bargraph
+	      } else if (state == SHOW_VOLT) {
+	          sct_value(calculate_voltage(),0);
+	          HAL_Delay(1000);
+	      } else if (state == SHOW_TEMP) {
+	          sct_value(calculate_temperature(),0);
+	          HAL_Delay(1000);
+	      }
+
+	      HAL_Delay(50); // Small delay to reduce CPU usage
+
   }
   /* USER CODE END 3 */
 }
@@ -230,6 +279,22 @@ static void MX_ADC_Init(void)
   {
     Error_Handler();
   }
+
+  /** Configure for the selected ADC regular channel to be converted.
+  */
+  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+  if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure for the selected ADC regular channel to be converted.
+  */
+  sConfig.Channel = ADC_CHANNEL_VREFINT;
+  if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN ADC_Init 2 */
 
   /* USER CODE END ADC_Init 2 */
@@ -300,6 +365,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : S2_Pin S1_Pin */
+  GPIO_InitStruct.Pin = S2_Pin|S1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LD2_Pin */
   GPIO_InitStruct.Pin = LD2_Pin;
