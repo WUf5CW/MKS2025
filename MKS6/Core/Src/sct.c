@@ -84,7 +84,7 @@ static const uint32_t reg_values[4][10] = {
 	},
 };
 
-void sct_value(uint16_t value, uint8_t led) {
+void sct_value(uint16_t value, uint8_t led, uint8_t point) {
     uint32_t reg = 0;
 
     // Extract digits and combine segment values
@@ -93,6 +93,10 @@ void sct_value(uint16_t value, uint8_t led) {
     reg |= reg_values[2][value % 10];          // Units
     reg |= reg_values[3][led];
 
+     if (value >= 0){
+    	if (point == 10) reg |= 0b0000100000000000 << 0;
+     	else if (point == 100) reg |= 0b1000000000000000 << 16;
+     }
     // Send to display
     sct_led(reg);
 }
