@@ -109,40 +109,48 @@ int main(void)
   int8_t converting=0;
   int32_t tick = HAL_GetTick();
   int32_t old_tick = tick;
-
+  int8_t state=1;
 
   while (1)
   {
-	  /*
-	  if (!converting){
-		  OWConvertAll();
-		  converting = 1;
+	  if (HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin) == 0) {
+	     state = 1;
+	  }
+	  else if (HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin) == 0) {
+	  	 state = 2;
+	  } else {
+	  state = state;
 	  }
 
-	  if (tick >= old_tick + CONVERT_T_DELAY){
-		  converting = 0;
-		  old_tick = tick;
+	  if (state == 1) {
+		  if (!converting){
+			  OWConvertAll();
+			  converting = 1;
+		  }
 
-		  int16_t temp;
-		  if (OWReadTemperature(&temp)) sct_value(temp/10,0,10);
-		  else sct_value(000,0,0);
+		  if (tick >= old_tick + CONVERT_T_DELAY){
+			  converting = 0;
+			  old_tick = tick;
+
+			  int16_t temp;
+			  if (OWReadTemperature(&temp)) sct_value(temp/10,0,10);
+			  else sct_value(000,0,0);
+			  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+			  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+		  }
 	  }
-*/
-	  if (tick >= old_tick + CONVERT_T_DELAY){
-		  old_tick = tick;
-		  int16_t temp = data[HAL_ADC_GetValue(&hadc)];
-		  sct_value(temp,0,10);
+
+	  if (state == 2) {
+		  if (tick >= old_tick + CONVERT_T_DELAY){
+			  old_tick = tick;
+			  int16_t temp = data[HAL_ADC_GetValue(&hadc)];
+			  sct_value(temp,0,10);
+			  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+			  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+		  }
 	  }
-
-
-
-
 
 	 tick = HAL_GetTick();
-
-
-
-
 
     /* USER CODE END WHILE */
 
@@ -299,9 +307,6 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, S2_Pin|S1_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LED1_Pin|LD2_Pin|DQ_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -316,9 +321,8 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : S2_Pin S1_Pin */
   GPIO_InitStruct.Pin = S2_Pin|S1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LED1_Pin LD2_Pin */
