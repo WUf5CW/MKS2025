@@ -45,7 +45,13 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-static volatile char key = '0';
+
+static volatile char key;
+static int pos = 0;
+volatile const char unlock_code[] = "7932#";
+volatile char entered_code[6] = "";
+static int last_key_time = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -110,9 +116,33 @@ int main(void)
 	  printf("Hello :D \n");*/
 
 	  if (key != 0) {
-		  printf("pressed '%c'\n", key);
-		  HAL_Delay(500);
-		  key = 0;
+	      printf("pressed '%c'\n", key);
+	      last_key_time = HAL_GetTick();
+
+	      if (key == '#') {
+	    	  entered_code[pos++] = key;
+	          entered_code[pos] = '\0';  // terminate string
+	          if (strcmp(unlock_code, entered_code) == 0) {
+	              printf("Unlocked, yaay! \n");
+	              HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+	              HAL_Delay(2000);
+	              HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+	          } else {
+	              printf("Wrong code :( \n");
+	              //printf("Comparing '%s' with '%s'\n", entered_code, unlock_code);
+	          }
+	          pos = 0;  // reset for next attempt
+	      } else {
+	          if (pos < sizeof(entered_code) - 1) {
+	              entered_code[pos++] = key;
+	          }
+	      }
+	      HAL_Delay(500);
+	      key = 0;
+	  }
+	  if (pos > 0 && (HAL_GetTick() - last_key_time > 5000)) {
+	      printf("Timeout! Resetting entered code.\n");
+	      pos = 0;
 	  }
     /* USER CODE END WHILE */
 
