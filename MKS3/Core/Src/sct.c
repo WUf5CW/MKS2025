@@ -8,6 +8,8 @@
 
 #include "sct.h"
 
+
+
 void sct_init(void) {
     sct_led(0);
 }

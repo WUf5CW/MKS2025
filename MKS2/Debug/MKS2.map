@@ -1599,17 +1599,17 @@ LOAD C:/appz/ST/STM32CubeIDE_1.10.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mc
  .debug_line    0x00002e25      0x776 ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usart.o
  .debug_line    0x0000359b      0x963 ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_utils.o
 
-.debug_str      0x00000000    0x34442
- .debug_str     0x00000000    0x34442 ./Core/Src/main.o
-                              0x325a0 (size before relaxing)
- .debug_str     0x00034442    0x31f8b ./Core/Src/stm32f0xx_it.o
- .debug_str     0x00034442    0x2c736 ./Core/Src/system_stm32f0xx.o
- .debug_str     0x00034442       0x62 ./Core/Startup/startup_stm32f030r8tx.o
- .debug_str     0x00034442    0x2ce28 ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_exti.o
- .debug_str     0x00034442    0x2d89b ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_gpio.o
- .debug_str     0x00034442    0x2e547 ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_rcc.o
- .debug_str     0x00034442    0x2fd75 ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usart.o
- .debug_str     0x00034442    0x2fb7d ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_utils.o
+.debug_str      0x00000000    0x34468
+ .debug_str     0x00000000    0x34468 ./Core/Src/main.o
+                              0x325a8 (size before relaxing)
+ .debug_str     0x00034468    0x31f8b ./Core/Src/stm32f0xx_it.o
+ .debug_str     0x00034468    0x2c736 ./Core/Src/system_stm32f0xx.o
+ .debug_str     0x00034468       0x62 ./Core/Startup/startup_stm32f030r8tx.o
+ .debug_str     0x00034468    0x2ce28 ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_exti.o
+ .debug_str     0x00034468    0x2d89b ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_gpio.o
+ .debug_str     0x00034468    0x2e547 ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_rcc.o
+ .debug_str     0x00034468    0x2fd75 ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usart.o
+ .debug_str     0x00034468    0x2fb7d ./Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_utils.o
 
 .comment        0x00000000       0x43
  .comment       0x00000000       0x43 ./Core/Src/main.o

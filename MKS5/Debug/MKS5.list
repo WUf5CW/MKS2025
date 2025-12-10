@@ -275,7 +275,6 @@ int _write(int file, char const *buf, int n)
 
 08000260 <uart_process_command>:
 
-
 static void uart_process_command(char *cmd){
  8000260:	b5b0      	push	{r4, r5, r7, lr}
  8000262:	b08a      	sub	sp, #40	@ 0x28

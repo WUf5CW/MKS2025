@@ -858,10 +858,10 @@ __STATIC_FORCEINLINE void __disable_irq(void)
  8000586:	e7fd      	b.n	8000584 <Error_Handler+0x8>
 
 08000588 <sct_init>:
- */
-
 
 #include "sct.h"
+
+
 
 void sct_init(void) {
  8000588:	b580      	push	{r7, lr}
