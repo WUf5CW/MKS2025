@@ -182,7 +182,7 @@ int main(void)
 	  if((HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin) == GPIO_PIN_SET)
 			  && (old_btn_tick + BTN_TIME) <= HAL_GetTick())
 	  {
-		  sprintf(send_data, "220807;press", counter++);
+		  sprintf(send_data, "220807;press");
 		  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 1);
 		  rfm95_send_receive_cycle(&rfm95_handle, (uint8_t *)send_data, strlen(send_data));
 		  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
